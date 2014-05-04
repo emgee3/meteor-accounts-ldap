@@ -9,12 +9,14 @@ LDAP.ldap = ldap;
 // Settings
 LDAP.serverIP = '172.16.0.1';
 LDAP.serverPort = 389;
-LDAP.searchQuery = {
+LDAP.searchQuery = function (username) {
   // This is Active Directory Specific!!!!
-  filter: '(&(objectCategory=person)' +  // search for people
-    '(sAMAccountName='+ options.username +')' +  // where the username = options.username
-    '(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))',  // and the account isn't disabled
-  scope: 'sub'
+  return {
+    filter: '(&(objectCategory=person)' +  // search for people
+      '(sAMAccountName=' + username + ')' +  // where the username = options.username
+      '(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))',  // and the account isn't disabled
+    scope: 'sub'
+  };
 };
 LDAP.searchOu = 'OU=User Accounts,OU=Staff,DC=ad,DC=example,DC=com';
 LDAP.searchDn = 'CN=SearchAcct,CN=Users,DC=ad,DC=example,DC=com';
@@ -41,7 +43,7 @@ LDAP.checkAccount = function(options) {
 
     var dn = [];
 
-    LDAP.client.search(LDAP.searchOu, LDAP.searchQuery, function (err, search) {
+    LDAP.client.search(LDAP.searchOu, LDAP.searchQuery(options.username), function (err, search) {
 
       search.on('searchEntry', function (entry) {
         dn.push(entry.object.distinguishedName);
