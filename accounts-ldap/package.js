@@ -23,4 +23,5 @@ Package.on_use(function (api) {
 
   api.add_files(["ldap.js","ldap-handler.js"], "server");
 
+  api.export('LDAP', 'server');
 });

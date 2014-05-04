@@ -53,7 +53,7 @@ LDAP.checkAccount = function(options) {
 
       search.on('end', function () {
         if (dn.length === 0) {
-          future.ret(false);
+          future['return'](false);
           return false;
         }
 
@@ -62,7 +62,7 @@ LDAP.checkAccount = function(options) {
         });
 
         testBind.bind(dn[0], options.password, function (err) {
-          future.ret(!err);
+          future['return'](!err);
         });
       });
 

@@ -1,8 +1,4 @@
-Accounts.registerLoginHandler(function(loginRequest) {
-
-  if (! loginRequest.hasOwnProperty('loginType')) return undefined;
-  if (loginRequest.loginType !== "LDAP") return undefined;
-
+Accounts.registerLoginHandler("ldap", function(loginRequest) {
   if (LDAP.checkAccount(loginRequest)) {
 
     var userId;
@@ -11,23 +7,20 @@ Accounts.registerLoginHandler(function(loginRequest) {
       userId = user._id;
     } else {
 
-      // pass on to next loginHandler
-      return undefined;
+      // If no Meteor Account is found for a valid LDAP logon, 
+      // you can either prevent logon by passing 'undefined' or
+      // you can automatically create the new account.
 
-      // or create new account
-      // userId = Meteor.users.insert({ username : loginRequest.username });
+      // return undefined;
+      userId = Meteor.users.insert({ username : loginRequest.username }); 
+
     }
 
-    var stampedToken = Accounts._generateStampedLoginToken();
-    Meteor.users.update(userId,
-      {$push: {'services.resume.loginTokens': stampedToken}}
-    );
-
     return {
-      id: userId,
-      token: stampedToken.token
+      userId: userId
     };
   }
 
-});
+  return undefined;
 
+});
